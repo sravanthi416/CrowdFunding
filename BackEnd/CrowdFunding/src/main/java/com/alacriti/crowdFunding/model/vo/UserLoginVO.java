@@ -9,6 +9,13 @@ public class UserLoginVO {
 		this.userEmail=userEmail;
 	}
 	UserLoginVO(){}
+	UserLoginVO(int id,String userEmail)
+	{
+		this.id=id;
+		this.userEmail=userEmail;
+	}
+	
+	
 	public String getUserName() {
 		return userName;
 	}

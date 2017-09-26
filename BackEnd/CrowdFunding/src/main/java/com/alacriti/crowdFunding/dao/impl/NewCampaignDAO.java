@@ -30,19 +30,17 @@ public class NewCampaignDAO extends BaseDAO{
 		try{
 			
 			statement=getConnection().createStatement();
-			System.out.println("In New Cmapaig after get connection");
-			System.out.println("-------&&&&&&77");
-			System.out.println("Title jg");
+			log.debug("In New Cmapaig after get connection");
 			categoryName=newCampaignVO.getCategory();
 			
 			
 			resultSet=statement.executeQuery(getCategoryIdSQLCmd(categoryName));
-			System.out.println("In New Cmapaig executing query");
-			System.out.println("Resultset is"+resultSet);
+			log.debug("In New Cmapaig executing query");
+			log.debug("Resultset is"+resultSet);
 			if(resultSet.next())
 			{
 				catId=resultSet.getInt("categoryId");
-				System.out.println("In New Cmapaig result set"+catId);
+				log.debug("In New Cmapaig result set"+catId);
 			}
 			preparedStatement=getPreparedStatement(getConnection(), addCampaignToSQLDBCmd());
 			preparedStatement.setInt(1,id);

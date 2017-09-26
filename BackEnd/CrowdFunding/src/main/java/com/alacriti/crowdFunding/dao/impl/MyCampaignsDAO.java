@@ -28,13 +28,17 @@ public class MyCampaignsDAO extends BaseDAO{
 		List<NewCampaignVO> campaigns=null;
 		Statement statement=null;
 		ResultSet resultSet=null;
+		log.info("before try in my campaigns");
 		try{
+			log.info("after try in my campaigns");
 			campaigns=new ArrayList<NewCampaignVO>();
 			statement=getConnection().createStatement();
 			resultSet=statement.executeQuery(getMyCampSQLCmd(userId));
-			while(resultSet.next());
+			log.info("before while.in my campaigns");
+			while(resultSet.next())
 			{
-				System.out.println("lis is before"+campaigns);
+				log.debug("lis is before"+campaigns);
+				log.info("in while of my Campaign");
 				resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID);
 				campaigns.add(new NewCampaignVO(resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED),
 						resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT),
@@ -44,10 +48,11 @@ public class MyCampaignsDAO extends BaseDAO{
 						resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME),
 						resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID),
 						Constants.IMAGE_PATH+resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_PHOTO)));
-				System.out.println("lis is "+campaigns);
-				System.out.println("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
+				log.info("lis is "+campaigns);
+				log.info("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
 			}
-			System.out.println("List size"+campaigns.size());		
+			log.info("List size"+campaigns.size());
+			System.out.println("List size no log"+campaigns.size());
 			
 				
 			}
@@ -77,20 +82,29 @@ public class MyCampaignsDAO extends BaseDAO{
 		Statement statement=null;
 		ResultSet rs=null;
 		String campaignName=null;
+		DonationModelVO doModelVO=null;
 		try{
 			
 			supporters=new ArrayList<DonationModelVO>();
 			statement=getConnection().createStatement();
-			
+			doModelVO = new DonationModelVO();
 			rs=statement.executeQuery(getPaymentsSQLcmd(userId));
+			log.info("Befor while in get my payments");
 			while(rs.next())
 			{
 				campaignName=getCampaignNameDB(rs.getInt(DBColumnConstants.DONATION_TBL_CAMPAIGNID));
+				doModelVO.setName(campaignName);
+				log.info("title og campaign in my payments"+campaignName);
 				supporters.add(new DonationModelVO(rs.getInt(DBColumnConstants.DONATION_TBL_USERID),
 						rs.getInt(DBColumnConstants.DONATION_TBL_AMOUNT),
 						rs.getString(DBColumnConstants.DONATION_TBL_COMMENTS),
-						campaignName
+						doModelVO.getName()
 						));		
+			}
+			for(DonationModelVO list:supporters)
+			{
+				log.info("usporjb"+list);
+				System.out.println("usporjb"+list);
 			}
 		}
 		catch(SQLException e)
@@ -120,7 +134,8 @@ public class MyCampaignsDAO extends BaseDAO{
 			rs=statement.executeQuery(getCampaign(id));
 			if(rs.next())
 			{
-				name=rs.getString(DBColumnConstants.USERS_TBL_NAME);
+				name=rs.getString(DBColumnConstants.CAMPAIGN_TBL_TITLE);
+				log.info("Name in getCampignName"+name);
 			}
 		}
 		catch(SQLException e)
@@ -140,10 +155,12 @@ public class MyCampaignsDAO extends BaseDAO{
 	
 	public String getCampaign(int campaignId)
 	{
-		return "select "+DBColumnConstants.CAMPAIGN_TBL_TITLE+
+		/*return "select "+DBColumnConstants.CAMPAIGN_TBL_TITLE+","
+	+DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+
 				"from sravanthir_crowdfunding_campaigns where "+
 				DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+" = "+campaignId;
-	}
+*/		return "select * from sravanthir_crowdfunding_campaigns where campaignId = "+campaignId;
+		}
 	
 	
 	public String getPaymentsSQLcmd(int userId)

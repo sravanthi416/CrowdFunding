@@ -19,7 +19,7 @@ public class DonationDelegate extends BaseDelegate{
 		boolean result=false;
 		try{
 			connection=startDBTransaction();
-			System.out.println("COnnection established");
+			log.debug("COnnection established");
 			setConnection(connection);
 			donationBO=new DonationBO(getConnection());
 			result=donationBO.donation(donModelVO, userId);			

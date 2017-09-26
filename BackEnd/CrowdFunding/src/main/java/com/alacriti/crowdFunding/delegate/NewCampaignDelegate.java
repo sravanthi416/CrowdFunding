@@ -15,20 +15,20 @@ public class NewCampaignDelegate extends BaseDelegate{
 	public static final Logger log=Logger.getLogger(NewCampaignDelegate.class);
 	public NewCampaignDelegate(){
 	}
-	public boolean newCampaign(CampaignMultipartDataVO campaignMultipartDataVO,int id)
+	public boolean newCampaign(CampaignMultipartDataVO campaignMultipartDataVO,int id,String email)
 	{
 		boolean result=false;
 		NewCampaignBO newCampaignBO=null;
 		Connection connection=null;
 		boolean rollBack=false;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			
 			newCampaignBO=new NewCampaignBO(getConnection());
-			result=newCampaignBO.newCampaign(campaignMultipartDataVO,id);
+			result=newCampaignBO.newCampaign(campaignMultipartDataVO,id,email);
 		}
 		catch(BOException e)
 		{
@@ -37,6 +37,7 @@ public class NewCampaignDelegate extends BaseDelegate{
 		}
 		catch(Exception e)
 		{
+			log.error(e.getMessage());
 			e.printStackTrace();
 		}
 		finally{

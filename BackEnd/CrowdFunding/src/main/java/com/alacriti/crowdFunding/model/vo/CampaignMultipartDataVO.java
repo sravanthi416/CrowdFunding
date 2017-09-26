@@ -19,6 +19,13 @@ public class CampaignMultipartDataVO {
 	public byte[] file;
 	public String friends;
 	
+	public String getFriends() {
+		return friends;
+	}
+	@FormParam("friends")
+	public void setFriends(String friends) {
+		this.friends = friends;
+	}
 	public int getAmountRaised() {
 		return amountRaised;
 	}

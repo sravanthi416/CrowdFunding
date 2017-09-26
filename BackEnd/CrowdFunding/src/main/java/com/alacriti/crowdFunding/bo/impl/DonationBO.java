@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.alacriti.crowdFunding.dao.impl.DAOException;
 import com.alacriti.crowdFunding.dao.impl.DonationDAO;
@@ -23,14 +24,16 @@ public class DonationBO extends BaseBO{
 		int amount=0;
 		int amountDonated=0;
 		int amountToUpdate=0;
+		boolean valid=false;
 		try{
 			donationDAO =new DonationDAO(getConnection());
 			campaignId=donationDAO.donation(donationModelVO, userId);
+			valid=isValidData(donationModelVO);
 			amount=donationDAO.getAmountGotFromtbl(campaignId);
 			amountDonated=donationModelVO.getAmountDonated();
-			System.out.println("AMount is donated"+amountDonated);
+			log.debug("AMount is donated"+amountDonated);
 			amountToUpdate=amount+amountDonated;
-			System.out.println("AMount is donated"+amountToUpdate);
+			log.debug("AMount is donated"+amountToUpdate);
 			result=donationDAO.updateCampaignTable(amountToUpdate,campaignId);
 			
 			/*result=true;*/
@@ -67,6 +70,21 @@ public class DonationBO extends BaseBO{
 			throw new BOException("ERROR occured in BO class of supporters");
 		}
 		return supporters;
+	}
+	public boolean isValidData(DonationModelVO doModelVO)
+	{
+		boolean result=true;
+		if(!Pattern.matches("^[1-9][0-9]{11}$", doModelVO.getAccountNo()))
+		{
+		result=false;	
+		}
+		if(!Pattern.matches("^[0-9]*",Integer.toString(doModelVO.getAmountDonated())))
+				{
+			result=false;
+				}
+		return result;
+		
+		
 	}
 	
 

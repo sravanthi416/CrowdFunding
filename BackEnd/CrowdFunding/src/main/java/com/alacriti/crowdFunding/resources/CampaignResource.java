@@ -13,19 +13,22 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
-import com.alacriti.crowdFunding.bo.impl.NewCampaignBO;
 import com.alacriti.crowdFunding.delegate.CampaignListDelegate;
 import com.alacriti.crowdFunding.delegate.DonationDelegate;
 import com.alacriti.crowdFunding.delegate.NewCampaignDelegate;
+import com.alacriti.crowdFunding.delegate.SearchDelegate;
 import com.alacriti.crowdFunding.model.vo.CampaignMultipartDataVO;
 import com.alacriti.crowdFunding.model.vo.CategoriesModelVO;
 import com.alacriti.crowdFunding.model.vo.DonationModelVO;
 import com.alacriti.crowdFunding.model.vo.NewCampaignVO;
 import com.alacriti.crowdFunding.model.vo.PaginationValues;
+import com.alacriti.crowdFunding.model.vo.SearchModelVO;
+
 
 @Path("campaign")
 public class CampaignResource {
@@ -41,15 +44,17 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		boolean result=false;
 		NewCampaignDelegate newCampaignDelegate=null;
 		int id=0;
+		String email=null;
 		try{
 			System.out.println("In camapign Resource");
 			HttpSession session= request.getSession(false);
 			System.out.println("*********ESSION IS "+session.getId());
 			id=(Integer) session.getAttribute("id");
-			System.out.println("ID is "+id);
+			log.debug("ID is "+id);
+			email=(String) session.getAttribute("email");
 			newCampaignDelegate=new NewCampaignDelegate();
-			System.out.println("In camapign Resource const");
-			result=newCampaignDelegate.newCampaign(campaignMultipartDataVO,id);
+			log.info("In camapign Resource const");
+			result=newCampaignDelegate.newCampaign(campaignMultipartDataVO,id,email);
 			
 			
 		}
@@ -63,7 +68,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 	@Path("campaignsList")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<NewCampaignVO> campaignList(PaginationValues paginationValues,@Context HttpServletRequest request)
+	public Response campaignList(PaginationValues paginationValues,@Context HttpServletRequest request)
 	{
 		NewCampaignVO newCampaignVO=null;
 		CampaignListDelegate campaignListDelegate =null;
@@ -72,7 +77,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		try{
 			newCampaignVO=new NewCampaignVO();
 			//HttpSession session= request.getSession(false);
-			//System.out.println("SESJIOSHF in Camaping list resource is"+session.getId());
+			//log.debug("SESJIOSHF in Camaping list resource is"+session.getId());
 			
 			System.out.println("CAme to Resource classs");
 			campaignListDelegate=new CampaignListDelegate();
@@ -80,14 +85,16 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 			//}
 			for(NewCampaignVO list:campaigns)
 			{
-			System.out.println("Resources is"+list);
+				log.debug("Resources is"+list);
 			}
+			return Response.ok().entity(campaigns).build() ;
 		}
 		catch(Exception e)
 		{
 			log.error("Error in campaigns list resource");
+			return Response.status(204).entity("No Campaigns Found").build();
 		}
-		return campaigns;
+		
 	}
 	@GET
 	@Path("count")
@@ -98,7 +105,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		int count=0;
 		try{
 			HttpSession session= request.getSession(false);
-			System.out.println("********SESsion  is*********** in count"+session);
+			log.debug("********SESsion  is*********** in count"+session);
 			campaignListDelegate =new CampaignListDelegate();
 			count=campaignListDelegate.getCampaignCount();
 		}
@@ -119,7 +126,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		System.out.println("campde");
 		try{
 			HttpSession session= request.getSession(false);
-			System.out.println("********SESsion  is*********** in count"+session);
+			log.debug("********SESsion  is*********** in count"+session);
 			campaignListDelegate =new CampaignListDelegate();
 			campaignDetails=campaignListDelegate.campaignDetails(campId);
 	}
@@ -143,9 +150,9 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		int id=0;
 		try{
 		HttpSession session= request.getSession(false);
-		System.out.println("********SESsion  is*********** in count"+session);	
+		log.debug("********SESsion  is*********** in count"+session);	
 		id=(Integer) session.getAttribute("id");
-		System.out.println("ID is "+id);
+		log.debug("ID is "+id);
 		donationDelegate = new DonationDelegate();
 		output=donationDelegate.Donation(donModelVO, id);
 		if(output==true)
@@ -160,6 +167,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		{
 			e.printStackTrace();
 		}
+		log.info("Result in donation is  "+result);
 		return result;
 		
 	}
@@ -173,9 +181,10 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		try
 		{
 			HttpSession session= request.getSession(false);
-			System.out.println("********SESsion  is*********** in count"+session.getId());
+			log.debug("********SESsion  is*********** in count"+session.getId());
 			donationDelegate =new DonationDelegate();
 			supporters = donationDelegate.supporters(campaignId);
+			
 		}
 		catch(Exception e)
 		{
@@ -214,15 +223,15 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		int id=0;
 		try{
 			//HttpSession session= request.getSession(false);
-			//System.out.println("SESJIOSHF in Camaping list resource is"+session.getId());
+			//log.debug("SESJIOSHF in Camaping list resource is"+session.getId());
 			
-			System.out.println("CAme to Resource classs");
+			log.debug("CAme to Resource classs");
 			campaignListDelegate=new CampaignListDelegate();
 			campaigns=campaignListDelegate.getCampaignCategories(paginationVal);
 			//}
 			for(NewCampaignVO list:campaigns)
 			{
-			System.out.println("Resources is"+list);
+				log.debug("Resources is"+list);
 			}
 		}
 		catch(Exception e)
@@ -240,7 +249,7 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 		int count=0;
 		try{
 			HttpSession session= request.getSession(false);
-			System.out.println("********SESsion  is*********** in count"+session);
+			log.debug("********SESsion  is*********** in count"+session);
 			campaignListDelegate =new CampaignListDelegate();
 			count=campaignListDelegate.getCampaignCategoriesCount(campaignId);
 		}
@@ -252,7 +261,32 @@ public static final Logger log = Logger.getLogger(CampaignResource.class);
 	}
 	
 	
-	
+	@POST
+	@Path("search")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response searchCampaigns(SearchModelVO searchMVO)
+	{
+		List<NewCampaignVO> results=null;
+		SearchDelegate searchDelegate=null;
+		try{
+			results=new ArrayList<NewCampaignVO>();
+			searchDelegate = new SearchDelegate();
+			results=searchDelegate.searchCampaigns(searchMVO);
+			if(results.size()>0)
+				return Response.ok().entity(results).build() ;
+			else
+				return Response.status(204).entity("No results found").build() ;
+			
+		}
+		catch(Exception e)
+		{
+			log.error("Error occured in resource class of search ");
+			return Response.status(400).entity("Bad request ").build() ;
+			
+		}
+		
+	}
 	
 	
 	

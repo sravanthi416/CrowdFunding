@@ -15,18 +15,18 @@ public class UserLoginDelegate extends BaseDelegate{
 		Connection connection = null;
 		System.out.println("Befor try block in userDelegate");
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection");
+			log.debug("after connection");
 			setConnection(connection);
 			userLoginBO=new UserLoginBO(getConnection());
-			System.out.println("got connection");
+			log.debug("got connection");
 			result=userLoginBO.UserLogin(userLoginVO);
 		}
 		catch(BOException e)
 		{
 			e.printStackTrace();
-			System.out.println("Exceptin occured in BOLogin"+e.getMessage());
+			log.debug("Exceptin occured in BOLogin"+e.getMessage());
 			rollBack = true;
 		}
 		finally {

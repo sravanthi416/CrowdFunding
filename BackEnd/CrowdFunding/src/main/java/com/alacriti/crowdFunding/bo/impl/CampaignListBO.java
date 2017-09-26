@@ -114,19 +114,19 @@ public class CampaignListBO extends BaseBO {
 			campaignListDAO =new CampaignListDAO(getConnection());
 			categoryId=pageValues.getCategoryId();
 			campaigns=campaignListDAO.getCampaignCategories(categoryId);
-			System.out.println("eNd is "+pageValues.getEnd());
-			System.out.println("eNd is "+pageValues.getStart());
+			log.debug("eNd is "+pageValues.getEnd());
+			log.debug("eNd is "+pageValues.getStart());
 			start=pageValues.getStart();
 			end=pageValues.getEnd();
 			
 			for(NewCampaignVO list:campaigns)
 			{
-				System.out.println("List is values******"+list);
+				log.debug("List is values******"+list);
 			}
 			
 			
 			if(start<campaigns.size()){
-				System.out.println("List in if");
+				log.debug("List in if");
 				if(end > campaigns.size()){
 						result=campaigns.subList(start, campaigns.size());
 				}

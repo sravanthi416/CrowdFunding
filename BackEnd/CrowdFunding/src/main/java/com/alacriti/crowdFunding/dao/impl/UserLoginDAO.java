@@ -102,7 +102,7 @@ public class UserLoginDAO extends BaseDAO{
 		try{	
 			statement=getConnection().createStatement();
 			rs=statement.executeQuery(userIdSQLCmd(email));
-			System.out.println("After selectb sql command");
+			log.debug("After selectb sql command");
 			if(rs.next()){
 				result=rs.getInt(DBColumnConstants.USERS_TBL_ID);
 			}
@@ -114,6 +114,7 @@ public class UserLoginDAO extends BaseDAO{
 		}
 		catch(Exception e){
 			e.printStackTrace();
+			log.error(e.getMessage());
 			throw new DAOException();
 		}
 		finally{

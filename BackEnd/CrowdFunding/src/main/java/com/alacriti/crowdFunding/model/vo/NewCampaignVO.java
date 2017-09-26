@@ -20,16 +20,19 @@ public class NewCampaignVO {
 	private int status;
 	private int campaignId;
 	private String userName;
+	private String friends;
+	
+	
 	public String getUserName() {
 		return userName;
 	}
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	List<String> friends=new ArrayList<String>();
+	
 	public NewCampaignVO(){}
 	NewCampaignVO(int amountRaised,String title,String category,
-			String beneficiaryName,String nameYourFundRaiser, String imagePath,String story,String expiryDate,List<String> friends,int status){
+			String beneficiaryName,String nameYourFundRaiser, String imagePath,String story,String expiryDate,String friends,int status){
 		this.amountRaised=amountRaised;
 		this.title=title;
 		this.category=category;
@@ -40,6 +43,12 @@ public class NewCampaignVO {
 		this.expiryDate=expiryDate;
 		this.friends=friends;
 		this.status=status;
+	}
+	public String getFriends() {
+		return friends;
+	}
+	public void setFriends(String friends) {
+		this.friends = friends;
 	}
 	public NewCampaignVO(int amountRaised,int amountGot,String title,String story,String userName,String beneficiaryName,int campaignId,String imagePath)
 	{
@@ -121,12 +130,7 @@ public class NewCampaignVO {
 	public void setExpiryDate(String expiryDate) {
 		this.expiryDate = expiryDate;
 	}
-	public List<String> getFriends() {
-		return friends;
-	}
-	public void setFriends(List<String> friends) {
-		this.friends = friends;
-	}
+	
 	public int getStatus() {
 		return status;
 	}

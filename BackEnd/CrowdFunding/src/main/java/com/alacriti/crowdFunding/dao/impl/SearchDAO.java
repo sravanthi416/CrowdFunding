@@ -23,6 +23,7 @@ public class SearchDAO extends BaseDAO{
 			ResultSet resultSet=null;
 			
 			try{
+				log.debug("Text in DAO clas is"+text);
 				campaigns=new ArrayList<NewCampaignVO>();
 				statement=getConnection().createStatement();
 				resultSet=statement.executeQuery(campaignsSearch(text));	
@@ -49,19 +50,18 @@ public class SearchDAO extends BaseDAO{
 		public String campaignsSearch(String text)
 		{
 			return "select "+DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED +","+
-		DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT+","+
+					DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT+","+
 					DBColumnConstants.CAMPAIGN_TBL_TITLE+","+
 					DBColumnConstants.CAMAPIGN_TBL_PHOTO+","+
 					DBColumnConstants.CAMPAIGN_TBL_USERID+","+
 					DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME+","+
 					DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
-		DBColumnConstants.CAMAPIGN_TBL_STORY +
-		" from sravanthir_crowdfunding_campaigns where "+
-		DBColumnConstants.CAMPAIGN_TBL_TITLE+"like %"+text+
-		"% or "+DBColumnConstants.CAMAPIGN_TBL_STORY+" like %"+text+"%" ;
+					DBColumnConstants.CAMAPIGN_TBL_STORY +
+					" from sravanthir_crowdfunding_campaigns where "+
+					DBColumnConstants.CAMPAIGN_TBL_TITLE+" like \"%"+text+
+					"%\" or "+DBColumnConstants.CAMAPIGN_TBL_STORY+" like '%"+text+"%'";
 			
-			/*return "select amountRaised,amountGot,title,story from sravanthir_crowdfunding_campaigns";*/
-		
+			
 			
 		}
 
@@ -104,10 +104,10 @@ public class SearchDAO extends BaseDAO{
 				campaigns=new ArrayList<NewCampaignVO>();
 				while(resultSet.next())
 				{
-					System.out.println("lis is before"+campaigns);
+					log.debug("lis is before"+campaigns);
 					resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID);
 					funderName=getFundRaiserName(resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID));
-					System.out.println("In campigns add funder name is "+funderName);
+					log.debug("In campigns add funder name is "+funderName);
 					campaigns.add(new NewCampaignVO(resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED),
 							resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT),
 							resultSet.getString(DBColumnConstants.CAMPAIGN_TBL_TITLE),
@@ -116,10 +116,10 @@ public class SearchDAO extends BaseDAO{
 							resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME),
 							resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID),
 							Constants.IMAGE_PATH+resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_PHOTO)));
-					System.out.println("lis is "+campaigns);
-					System.out.println("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
+					log.debug("lis is "+campaigns);
+					log.debug("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
 				}
-				System.out.println("List size"+campaigns.size());		
+				log.debug("List size"+campaigns.size());		
 			}
 			catch(Exception e)
 			{
@@ -128,15 +128,16 @@ public class SearchDAO extends BaseDAO{
 			return campaigns;
 		}
 		
-		public List<NewCampaignVO> searchByDate(String text)throws DAOException{
+		public List<NewCampaignVO> searchByDate(String date)throws DAOException{
 			List<NewCampaignVO> campaigns=null;
 				Statement statement=null;
 				ResultSet resultSet=null;
 				
 				try{
+					log.debug("In searchh BY date "+date);
 					campaigns=new ArrayList<NewCampaignVO>();
 					statement=getConnection().createStatement();
-					resultSet=statement.executeQuery(campaignsSearchDate(text));	
+					resultSet=statement.executeQuery(campaignsSearchDate(date));	
 					campaigns=getResultSet(resultSet);		
 					
 				}
@@ -158,16 +159,19 @@ public class SearchDAO extends BaseDAO{
 		
 		public String campaignsSearchDate(String date)
 		{
-			return "select "+DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED +","+
+			String query="select "+DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED +","+
 					DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT+","+
-								DBColumnConstants.CAMPAIGN_TBL_TITLE+","+
-								DBColumnConstants.CAMAPIGN_TBL_PHOTO+","+
-								DBColumnConstants.CAMPAIGN_TBL_USERID+","+
-								DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME+","+
-								DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
+					DBColumnConstants.CAMPAIGN_TBL_TITLE+","+
+					DBColumnConstants.CAMAPIGN_TBL_PHOTO+","+
+					DBColumnConstants.CAMPAIGN_TBL_USERID+","+
+					DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME+","+
+					DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
+					DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+","+
 					DBColumnConstants.CAMAPIGN_TBL_STORY +
 					" from sravanthir_crowdfunding_campaigns where "+
-					DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+" <= "+date ;
+					DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+" <= \""+date+"\"";
+			
+			return query;
 		}
 		
 		public List<NewCampaignVO> searchBoth(String date,String text)throws DAOException
@@ -210,9 +214,9 @@ public class SearchDAO extends BaseDAO{
 								DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
 					DBColumnConstants.CAMAPIGN_TBL_STORY +
 					" from sravanthir_crowdfunding_campaigns where "+
-					DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+" <= "+
-					expiryDate+"and ( +"+DBColumnConstants.CAMPAIGN_TBL_TITLE+" like '% "+text+"%' or "+
-					DBColumnConstants.CAMAPIGN_TBL_STORY+"like '%"+text+"%')" ;
+					DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+" <= \""+
+					expiryDate+"\" and ( +"+DBColumnConstants.CAMPAIGN_TBL_TITLE+" like \"%"+text+"%\" or "+
+					DBColumnConstants.CAMAPIGN_TBL_STORY+" like \"%"+text+"%\" )" ;
 			
 		}
 		

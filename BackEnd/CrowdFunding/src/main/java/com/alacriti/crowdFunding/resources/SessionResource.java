@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
 
-import com.alacriti.crowdFunding.util.SessionUtility;
+import com.alacriti.crowdFunding.util.SessionUtil;
 @Path("session")
 public class SessionResource {
 	
@@ -21,10 +21,12 @@ public class SessionResource {
 		@Produces(MediaType.TEXT_PLAIN)
 		public boolean checkSessoin(@Context HttpServletRequest request)
 		{
-		SessionUtility sessionUtility=new SessionUtility();
+		SessionUtil sessionUtil=new SessionUtil();
 		HttpSession session= request.getSession(false);
-		System.out.println("session in checkSession :"+session.getId());
-		return sessionUtility.checkForSession(request);
+		log.debug("session in checkSession :"+session.getId());
+		boolean flag = sessionUtil.checkForSession(request);
+				log.info("session here >>>>>>>" + flag );
+				return flag;
 		}
 		
 
@@ -34,18 +36,18 @@ public class SessionResource {
 		public boolean sessoinDestroy(@Context HttpServletRequest request)
 		{
 			boolean result=false;
-			SessionUtility sessionUtility=null;
+			SessionUtil sessionUtil=null;
 			HttpSession session=null;
 			try{
-			sessionUtility=new SessionUtility();
+			sessionUtil=new SessionUtil();
 			session= request.getSession(false);
-			System.out.println("session in checkSession :"+session.getId());
+			log.debug("session in checkSession :"+session.getId());
 			session.invalidate();
 			result=true;
 		}catch(Exception e){
 			e.printStackTrace();
 			result=false;
-			System.out.println("Exception occured in destroying session");
+			log.error("Exception occured in destroying session");
 		}
 		return result;
 		}

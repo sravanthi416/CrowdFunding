@@ -25,6 +25,7 @@ public class MyCampaignsDelegate extends BaseDelegate{
 			myCampaigns=new ArrayList<NewCampaignVO>();
 			connection=startDBTransaction();
 			setConnection(connection);
+			log.info("COnnection is established in my campigns DAO");
 			myCampaignsBO =new MyCampaignsBO(getConnection());
 			myCampaigns=myCampaignsBO.getMyCampaigns(userId);
 					
@@ -56,6 +57,7 @@ public class MyCampaignsDelegate extends BaseDelegate{
 		MyCampaignsBO myCampaignsBO=null;
 		try{
 			myCampaigns=new ArrayList<DonationModelVO>();
+			log.debug("Befor connection");
 			connection=startDBTransaction();
 			setConnection(connection);
 			myCampaignsBO =new MyCampaignsBO(getConnection());

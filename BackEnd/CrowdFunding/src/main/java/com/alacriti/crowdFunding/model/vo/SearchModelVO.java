@@ -3,7 +3,7 @@ package com.alacriti.crowdFunding.model.vo;
 public class SearchModelVO {
 private String text;
 private String date;
-
+public SearchModelVO(){}
 
 public SearchModelVO(String text, String date) {
 	super();

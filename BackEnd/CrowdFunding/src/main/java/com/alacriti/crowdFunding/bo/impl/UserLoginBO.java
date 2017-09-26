@@ -24,7 +24,7 @@ public boolean UserLogin(UserLoginVO userLoginVO) throws BOException
 	}
 	catch(DAOException e)
 	{
-		System.out.println("DAOException in userLogin useroginDAO"+e.getMessage());
+		log.debug("DAOException in userLogin useroginDAO"+e.getMessage());
 		e.printStackTrace();
 		throw new BOException("BOEXcpeition in userLoginBO"+e.getMessage());
 	}

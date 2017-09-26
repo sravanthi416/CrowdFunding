@@ -1,10 +1,15 @@
 package com.alacriti.crowdFunding.dao.impl;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -27,13 +32,14 @@ public class CampaignListDAO extends BaseDAO {
 		try{
 			campaigns=new ArrayList<NewCampaignVO>();
 			statement=getConnection().createStatement();
-			resultSet=statement.executeQuery(listOfCampaigns());	
+			resultSet=statement.executeQuery(listOfCampaigns());
+			updateStatus();
 			while(resultSet.next())
 			{		
-				System.out.println("lis is before"+campaigns);
+				log.debug("lis is before"+campaigns);
 				resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID);
 				funderName=getFundRaiserName(resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID));
-				System.out.println("In campigns add funder name is "+funderName);
+				log.debug("In campigns add funder name is "+funderName);
 				campaigns.add(new NewCampaignVO(resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED),
 						resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT),
 						resultSet.getString(DBColumnConstants.CAMPAIGN_TBL_TITLE),
@@ -42,10 +48,10 @@ public class CampaignListDAO extends BaseDAO {
 						resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME),
 						resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID),
 						Constants.IMAGE_PATH+resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_PHOTO)));
-				System.out.println("lis is "+campaigns);
-				System.out.println("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
+				log.debug("lis is "+campaigns);
+				log.debug("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
 			}
-			System.out.println("List size"+campaigns.size());		
+			log.debug("List size"+campaigns.size());		
 			
 		}
 		catch(SQLException e)
@@ -74,8 +80,8 @@ public class CampaignListDAO extends BaseDAO {
 				DBColumnConstants.CAMPAIGN_TBL_USERID+","+
 				DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME+","+
 				DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
-	DBColumnConstants.CAMAPIGN_TBL_STORY +
-	" from sravanthir_crowdfunding_campaigns order by"+DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE;
+	DBColumnConstants.CAMAPIGN_TBL_STORY +","+DBColumnConstants.CAMAPIGN_TBL_STATUS+
+	" from sravanthir_crowdfunding_campaigns where status = 0 order by "+DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE ;
 		
 		/*return "select amountRaised,amountGot,title,story from sravanthir_crowdfunding_campaigns";*/
 		
@@ -128,7 +134,9 @@ public class CampaignListDAO extends BaseDAO {
 						rs.getString(DBColumnConstants.CAMAPIGN_TBL_STORY),
 						rs.getString(DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE))
 						);
-				System.out.println("lis is "+campaignDetails);
+				log.debug("lis is "+campaignDetails);
+				
+				
 					}
 		}
 		catch(SQLException e)
@@ -198,10 +206,10 @@ public class CampaignListDAO extends BaseDAO {
 			resultSet=statement.executeQuery(getCampaigns(categoryId));	
 			while(resultSet.next())
 			{		
-				System.out.println("lis is before"+campaigns);
+				log.debug("lis is before"+campaigns);
 				resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID);
 				funderName=getFundRaiserName(resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_USERID));
-				System.out.println("In campigns add funder name is "+funderName);
+				log.debug("In campigns add funder name is "+funderName);
 				campaigns.add(new NewCampaignVO(resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED),
 						resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT),
 						resultSet.getString(DBColumnConstants.CAMPAIGN_TBL_TITLE),
@@ -210,8 +218,8 @@ public class CampaignListDAO extends BaseDAO {
 						resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_BENEFICIARYNAME),
 						resultSet.getInt(DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID),
 						Constants.IMAGE_PATH+resultSet.getString(DBColumnConstants.CAMAPIGN_TBL_PHOTO)));
-				System.out.println("lis is "+campaigns);
-				System.out.println("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
+				log.debug("lis is "+campaigns);
+				log.debug("values are"+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTRAISED)+resultSet.getInt(DBColumnConstants.CAMAPIGN_TBL_AMOUNTGOT));
 			}
 			System.out.println("List size"+campaigns.size());		
 			
@@ -254,9 +262,10 @@ public class CampaignListDAO extends BaseDAO {
 		if(rs.next())
 		{
 			count=rs.getInt(1);
+			
 		}
 		//count=rs.getFetchSize();
-		System.out.println("Count is "+count);
+		log.debug("Count is "+count);
 		}
 		catch(SQLException e)
 		{
@@ -276,8 +285,78 @@ public class CampaignListDAO extends BaseDAO {
 	
 
 
+public void updateStatus()
+{
+	Statement stmt=null;
+	ResultSet rs=null;
+	long  daysLeft=0;
+	Date createdDate=null;
+	String expiryDate= null;
+	int campaignId=0;
+	long toDate;
+	try{
+		log.info("came to updte staus&&&&&&&&&");
+		stmt=getConnection().createStatement();
+		rs=stmt.executeQuery(getStatusCmd());
+		
+		while(rs.next())
+		{
+			expiryDate=rs.getString("expiryDate");
+			createdDate=rs.getDate("createdDate");
+			campaignId=rs.getInt("campaignId");
+			Date dateFormat = null;
+			try {
+				dateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(expiryDate);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			Date date = new Date();
+			//System.out.println(dateFormat.format(date));
+			toDate=dateFormat.getTime()-date.getTime();
+			daysLeft=toDate/1000/60/60/24;
+			if(daysLeft < 0)
+			{
+				updateCampaigns(campaignId);
+			}
+			log.info("Difference of dates%%%%%%%%%%%     "+toDate/1000/60/60/24);
+			}
+		
+		
+	}
+	catch(SQLException e)
+	{
+		e.printStackTrace();
+	}
+}
 
+public String getStatusCmd()
+{
+	return "select "+DBColumnConstants.CAMAPIGN_TBL_EXPIRYDATE+","+
+DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+","+
+			DBColumnConstants.CAMAPIGN_TBL_CREATEDDATE+" from sravanthir_crowdfunding_campaigns ";
+}
+
+public void updateCampaigns(int campaignId)
+{
+	PreparedStatement preStatement=null;
+	try
+	{
+		preStatement=getPreparedStatement(getConnection(), updateCampaignSQLDBCmd(campaignId));
+		preStatement.executeUpdate();
+	}
+	catch(Exception e)
+	{
+		e.printStackTrace();
+	}
+}
+public String updateCampaignSQLDBCmd(int campaignId)
+{
+	return "update sravanthir_crowdfunding_campaigns set "+
+			DBColumnConstants.CAMAPIGN_TBL_STATUS+
+			"=1 where "+DBColumnConstants.CAMPAIGN_TBL_CAMPAIGNID+" = "+campaignId;
 	
+}
 	
 
 }

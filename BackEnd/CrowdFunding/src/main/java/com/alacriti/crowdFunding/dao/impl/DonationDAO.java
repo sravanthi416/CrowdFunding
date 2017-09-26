@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.alacriti.crowdFunding.constants.DBColumnConstants;
 import com.alacriti.crowdFunding.model.vo.DonationModelVO;
+import com.alacriti.crowdFunding.model.vo.NewCampaignVO;
 
 public class DonationDAO extends BaseDAO{
 public DonationDAO(){}
@@ -140,19 +141,21 @@ public List<DonationModelVO> supporters(int campignId)throws DAOException
 	Statement statement=null;
 	ResultSet rs=null;
 	String userName=null;
+	DonationModelVO donationModelVO =null;
 	try{
 		
 		supporters=new ArrayList<DonationModelVO>();
 		statement=getConnection().createStatement();
-		
+		donationModelVO =new DonationModelVO();
 		rs=statement.executeQuery(getSupportersSQLcmd(campignId));
 		while(rs.next())
 		{
 			userName=getUserNameDB(rs.getInt(DBColumnConstants.DONATION_TBL_USERID));
+			donationModelVO.setName(userName);
 			supporters.add(new DonationModelVO(rs.getInt(DBColumnConstants.DONATION_TBL_CAMPAIGNID),
 					rs.getInt(DBColumnConstants.DONATION_TBL_AMOUNT),
 					rs.getString(DBColumnConstants.DONATION_TBL_COMMENTS),
-					userName
+					donationModelVO.getName()
 					));		
 		}
 	}
@@ -211,4 +214,6 @@ public String getUser(int id)
 	return "select "+DBColumnConstants.USERS_TBL_NAME+
 			" from sravanthir_crowdfunding_users where "+ DBColumnConstants.USERS_TBL_ID+" = "+id;
 }
+
+
 }

@@ -25,9 +25,9 @@ public class CampaignListDelegate extends BaseDelegate{
 		boolean rollBack = false;
 		Connection connection=null;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			campaignListBO=new CampaignListBO(getConnection());
 			campaigns=campaignListBO.campaignList(paginationValues);
@@ -53,9 +53,9 @@ public class CampaignListDelegate extends BaseDelegate{
 		Connection connection=null;
 		CampaignListBO campaignListBO=null;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			campaignListBO=new CampaignListBO(getConnection());
 			count=campaignListBO.getCampaignCount();	
@@ -81,9 +81,9 @@ public class CampaignListDelegate extends BaseDelegate{
 		boolean rollBack = false;
 		Connection connection=null;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			campaignListBO=new CampaignListBO(getConnection());
 			campaigns=campaignListBO.campaignDetails(campId);
@@ -111,9 +111,9 @@ public class CampaignListDelegate extends BaseDelegate{
 		boolean rollBack = false;
 		Connection connection=null;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			campaignListBO=new CampaignListBO(getConnection());
 			campaigns=campaignListBO.getCampaignCategories(pageValues);
@@ -138,9 +138,9 @@ public class CampaignListDelegate extends BaseDelegate{
 		Connection connection=null;
 		CampaignListBO campaignListBO=null;
 		try{
-			System.out.println("Bfor connection");
+			log.debug("Bfor connection");
 			connection = startDBTransaction();
-			System.out.println("after connection"+connection);
+			log.debug("after connection"+connection);
 			setConnection(connection);
 			campaignListBO=new CampaignListBO(getConnection());
 			count=campaignListBO.getCampaignCategoriesCount(categoryId);	
